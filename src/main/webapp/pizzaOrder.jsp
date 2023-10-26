@@ -19,22 +19,22 @@
         <form action="pizza" method="post">
             <input type="hidden" name="param" value="orderPizza"/>
             <div style="display: flex">
-                <div style="width: 50%">
+                <div style="width: 35%">
+                    <h3>PIZZA</h3>
                     <c:forEach items="${pizzas}" var="pizza" varStatus="pizzaStatus">
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" name="pizzaName" id="pizza_${pizza.name}"
                             value="${pizza.name}"/>
                             <label class="form-check-label" for="pizza_${pizza.name}">${pizza.name}</label>
                         </div>
-                        <p>STATUS: ${pizzaStatus.index}</p>
                         <div class="mb-3 w-50">
                             <input type="number" class="form-control" id="quantity_${pizza.name}"
                                    name="${pizza.name}_Quantity" min="1" value="1"/>
                         </div>
                     </c:forEach>
                 </div>
-                <div style="width: 50%;">
-                    <h3>additional ingredients</h3>
+                <div style="width: 35%;">
+                    <h3>ADDITIONAL INGREDIENTS</h3>
                     <div  style="height: 500px; overflow-y: auto">
                         <c:forEach items="${ingredients}" var="ingredient">
                             <div class="mb-3 form-check">
@@ -47,8 +47,39 @@
                         </c:forEach>
                     </div>
                 </div>
+                <div class="shadow p-3 mb-5 bg-white rounded" style="width: 30%">
+                    <h3>DELIVERY</h3>
+                    <div class="mb-3 w-100">
+                        <div class="mb-3 w-100">
+                            <label for="firstname" class="form-label">Firstname:</label>
+                            <input type="text" class="form-control" id="firstname" name="firstname" required>
+                        </div>
+                        <div class="mb-3 w-100">
+                            <label for="lastname" class="form-label">Lastname:</label>
+                            <input type="text" class="form-control" id="lastname" name="lastname" required>
+                        </div>
+                        <div class="mb-3 w-100">
+                            <label for="phone" class="form-label">Phone`s number:</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" required>
+                        </div>
+                        <div class="mb-3 w-100">
+                            <label for="email" class="form-label">E-Mail:</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3 w-100">
+                            <label for="region" class="form-label">Select region:</label>
+                            <select class="form-control" id="region" name="region" required>
+                                <c:forEach items="${regions}" var="region">
+                                    <option value="${region.name_region}">${region.name_region}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <input type="submit" class="btn btn-outline-primary" value="Submit Order"/>
+            <div class="d-flex justify-content-end">
+                <input type="submit" class="btn btn-outline-primary" value="Submit Order"/>
+            </div>
         </form>
     </div>
 </body>

@@ -9,7 +9,7 @@
         </form>
       </li>
       <li class="nav-item">
-        <form action="pizza" method="post">
+        <form action="constructor_pizza" method="post">
           <input type="hidden" name="param" value="makePizza" />
           <input type="submit" class="nav-link" value="CREATE YOUR OWN PIZZA">
         </form>

@@ -1,8 +1,6 @@
 package com.example.dz_13_pizza_bean_servlet;
 
-import com.example.dz_13_pizza_bean_servlet.bean.Ingredient;
-import com.example.dz_13_pizza_bean_servlet.bean.Pizza;
-import com.example.dz_13_pizza_bean_servlet.bean.PizzaOrder;
+import com.example.dz_13_pizza_bean_servlet.bean.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -45,17 +43,22 @@ public class PizzaServlet extends HttpServlet {
             connect();
             String message = "The connection was successful!";
             request.setAttribute("message", message);
+            putListFromDB(request);
             getServletContext().getRequestDispatcher("/pizza.jsp").forward(request, response);
         }else if("insert".equals(paramFromForm)){
             insert();
             String message = "The insertion was successful!";
             request.setAttribute("message", message);
+            putListFromDB(request);
             getServletContext().getRequestDispatcher("/pizza.jsp").forward(request, response);
         }else if("readyMadePizza".equals(paramFromForm)){
             List<Pizza> pizzas = getAllPizzas();
             List<Ingredient> ingredients = getAllIngredients();
+            List<Region> regions = getAllRegions();
             request.setAttribute("pizzas", pizzas);
             request.setAttribute("ingredients", ingredients);
+            request.setAttribute("regions", regions);
+            putListFromDB(request);
             getServletContext().getRequestDispatcher("/pizzaOrder.jsp").forward(request, response);
         }else if("orderPizza".equals(paramFromForm)){
             String[] pizzas = request.getParameterValues("pizzaName");
@@ -69,36 +72,50 @@ public class PizzaServlet extends HttpServlet {
                 pizzaOrder.setCount(countInt);
                 pizzaOrderList.add(pizzaOrder);
             }
+            Person person = new Person();
+            person.setFirstname(request.getParameter("firstname"));
+            person.setLastname(request.getParameter("lastname"));
+            person.setPhone(request.getParameter("phone"));
+            person.setEmail(request.getParameter("email"));
+            person.setRegion(request.getParameter("region"));
+            request.setAttribute("delivery", person);
             request.setAttribute("pizzaOrderList", pizzaOrderList);
             request.setAttribute("ingredients", ingredients);
+            putListFromDB(request);
             getServletContext().getRequestDispatcher("/showOrder.jsp").forward(request,response);
         }
     }
 
     private void connect(){
-        String pizzas = "CREATE TABLE pizzas(" +
+        String pizzas = "CREATE TABLE IF NOT EXISTS pizzas(" +
                 "id int auto_increment primary key not null, " +
                 "name_pizza nvarchar(250) not null unique);";
 
-        String ingredients = "CREATE TABLE ingredients(" +
+        String ingredients = "CREATE TABLE IF NOT EXISTS ingredients(" +
                 "id int auto_increment primary key not null, " +
                 "name_ingredient nvarchar(250) not null unique);";
 
-        String categories = "CREATE TABLE categories(" +
+        String categories = "CREATE TABLE IF NOT EXISTS categories(" +
                 "id int auto_increment primary key not null," +
                 "name_category nvarchar(250) not null unique);";
 
-        String myPizzaIngredients = "CREATE TABLE mypizzaingredients(" +
+        String myPizzaIngredients = "CREATE TABLE IF NOT EXISTS mypizzaingredients(" +
                 "id int auto_increment primary key not null, " +
                 "category_id int not null, " +
                 "name_ingredient nvarchar(250) not null unique, " +
                 "is_multi bit not null, FOREIGN KEY (category_id) references categories(id));";
+
+        String regions = "CREATE TABLE IF NOT EXISTS regions(" +
+                "id int auto_increment primary key not null, " +
+                "name_region nvarchar(250) not null" +
+                ");";
 
         try {
             statement.executeUpdate(pizzas);
             statement.executeUpdate(ingredients);
             statement.executeUpdate(categories);
             statement.executeUpdate(myPizzaIngredients);
+            statement.executeUpdate(regions);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -165,14 +182,32 @@ public class PizzaServlet extends HttpServlet {
                 "(7, 'Shrimp', 1), " +
                 "(7, 'Clams', 1);";
 
+        String regions = "INSERT INTO regions (name_region) VALUES" +
+                "('Mitte'), " +
+                "('Schildesche'), " +
+                "('Gadderbaum'), " +
+                "('Sieker'), " +
+                "('Brackwede'), " +
+                "('Heepen'), " +
+                "('Jöllenbeck'), " +
+                "('Senne'), " +
+                "('Stieghorst'), " +
+                "('Ummeln');";
+
         try {
             statement.executeUpdate(pizzas);
             statement.executeUpdate(ingredients);
             statement.executeUpdate(categories);
             statement.executeUpdate(myPizzaIngredients);
+            statement.executeUpdate(regions);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+    private void putListFromDB(HttpServletRequest request){
+        List<Pizza> pizzas = getAllPizzas();
+        int size = pizzas.size();
+        request.setAttribute("pizzasSize", size);
     }
     private List<Pizza> getAllPizzas(){
         String query = "SELECT * FROM pizzas";
@@ -210,5 +245,22 @@ public class PizzaServlet extends HttpServlet {
             throw new RuntimeException(e);
         }
         return ingredients;
+    }
+    private List<Region> getAllRegions(){
+        String query = "SELECT * FROM regions;";
+        List<Region> periods = new ArrayList<>();
+        try {
+            ResultSet resultSet = statement.executeQuery(query);
+            while(resultSet.next()){
+                Region region = new Region();
+                region.setId(resultSet.getInt("id"));
+                region.setName_region(resultSet.getString("name_region"));
+
+                periods.add(region);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return periods;
     }
 }
